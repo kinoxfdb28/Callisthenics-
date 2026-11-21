@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101713">
+<meta name="description" content="Ton carnet personnel de callisthénie sur 12 semaines.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Calisthenics Tracker</title>
+<style>
+:root{color-scheme:dark;--bg:#101713;--panel:#19231d;--panel2:#202d25;--line:#304137;--text:#f1f6f1;--muted:#a5b5a9;--green:#8be0a7;--green2:#2d8b55;--red:#ff9d9d;--radius:18px;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#254632 0,transparent 40%),var(--bg);color:var(--text);min-height:100vh}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+.app{max-width:760px;margin:auto;padding:env(safe-area-inset-top) 16px calc(28px + env(safe-area-inset-bottom))}
+header{padding:25px 2px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);font-weight:800}
+h1{font-size:27px;line-height:1.08;margin:5px 0 0;letter-spacing:-.04em}
+h2{font-size:18px;margin:0 0 12px;letter-spacing:-.02em}
+h3{font-size:15px;margin:0}
+.sub{color:var(--muted);font-size:13px}
+.logo{width:44px;height:44px;border-radius:15px;background:#234532;display:grid;place-items:center;color:var(--green);font-size:23px}
+.card{background:linear-gradient(145deg,#1b2820,#172019);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:12px 0;box-shadow:0 12px 35px #0002}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--panel2);border-radius:14px;padding:12px}
+.stat strong{display:block;font-size:23px;margin-top:3px}
+.muted{color:var(--muted);font-size:12px}
+.progress{height:8px;background:#314137;border-radius:99px;overflow:hidden;margin:10px 0}
+.progress>span{display:block;height:100%;background:linear-gradient(90deg,#4cb978,var(--green));border-radius:99px;transition:width .2s}
+.tabs{display:flex;background:#172019;border:1px solid var(--line);padding:4px;border-radius:14px;gap:4px}
+.tabs button{flex:1;border:0;background:transparent;color:var(--muted);padding:11px 8px;border-radius:10px;font-weight:750}
+.tabs button.active{background:#2b4936;color:#d8ffe2}
+select,input,textarea{width:100%;border:1px solid var(--line);background:#111a14;color:var(--text);border-radius:11px;padding:11px}
+.exercise{border:1px solid var(--line);border-radius:15px;padding:13px;margin:9px 0;background:#172119}
+.exercise.done{border-color:#4b9d69;background:#1b3022}
+.ex-top{display:flex;gap:12px;align-items:flex-start}
+.ex-num{width:28px;height:28px;flex:0 0 28px;border-radius:9px;background:#2b4936;color:var(--green);display:grid;place-items:center;font-weight:800;font-size:12px}
+.ex-main{flex:1;min-width:0}
+.ex-meta{color:var(--muted);font-size:12px;margin-top:4px}
+.check{width:25px;height:25px;accent-color:#65cf88}
+.ex-tip{color:var(--muted);font-size:12px;margin:10px 0 0 40px}
+.details{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 0 40px}
+.details label{font-size:11px;color:var(--muted)}
+.details input{margin-top:4px;padding:8px}
+.btn{border:1px solid var(--line);background:#26382b;color:var(--text);padding:12px 14px;border-radius:12px;font-weight:750}
+.btn.primary{background:var(--green);color:#102017;border-color:var(--green)}
+.btn.ghost{background:transparent}
+.btn.full{width:100%}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.weekline{display:grid;grid-template-columns:repeat(12,1fr);gap:5px;margin:13px 0}
+.weekline button{border:0;border-radius:5px;height:9px;background:#35443a;padding:0}
+.weekline button.selected{background:var(--green)}
+.weekline button.past{background:#42875a}
+.section{margin-top:20px}
+.timer{text-align:center;padding:12px}
+.timer strong{display:block;font-size:42px;letter-spacing:-.04em;font-variant-numeric:tabular-nums;margin:4px}
+.history-item{padding:12px 0;border-bottom:1px solid var(--line)}
+.history-item:last-child{border:0}
+.badge{font-size:10px;padding:5px 8px;border-radius:99px;background:#254a32;color:#baf4c9;font-weight:800}
+.nav{position:sticky;bottom:8px;margin:18px auto 0;display:flex;gap:5px;background:#1b2820ed;backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:16px;padding:5px}
+.nav button{flex:1;background:transparent;color:var(--muted);border:0;border-radius:11px;padding:9px 3px;font-size:11px}
+.nav button.active{background:#2b4936;color:#e2ffea}
+.nav span{display:block;font-size:18px;margin-bottom:2px}
+.note{min-height:75px;resize:vertical}
+.small{font-size:11px;color:var(--muted);line-height:1.5}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#e1ffe9;color:#102017;padding:11px 16px;border-radius:99px;font-weight:750;font-size:13px;display:none;z-index:5;box-shadow:0 8px 30px #0006}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:15px 0 4px}
+@media(min-width:600px){.app{padding-left:24px;padding-right:24px}.exercise{padding:16px}.card{padding:20px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+ <div><div class="eyebrow">12 semaines · sans matériel</div><h1>Calisthenics<br>Tracker</h1><div class="sub">Ton entraînement, à ton rythme.</div></div>
+ <div class="logo">✳</div>
+</header>
+<main id="view"></main>
+<nav class="nav" aria-label="Navigation">
+ <button data-page="train" class="active"><span>◉</span>Séance</button>
+ <button data-page="progress"><span>↗</span>Progression</button>
+ <button data-page="history"><span>▤</span>Historique</button>
+ <button data-page="settings"><span>⚙</span>Réglages</button>
+</nav>
+<footer>Données enregistrées sur cet appareil · fonctionne hors connexion après installation</footer>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const workouts={
+ A:{title:"Force & poussée",desc:"Pectoraux, épaules, jambes et sangle abdominale",items:[
+  ["Pompes classiques","3 séries · 5 à 8 répétitions","Corps aligné, poitrine vers le sol. Garde 1 à 2 répétitions en réserve."],
+  ["Squats","3 séries · 12 à 15 répétitions","Pieds stables, genoux dans l'axe des pieds, descente contrôlée."],
+  ["Pike push-ups","3 séries · 5 à 8 répétitions","Hanches hautes, tête entre les mains. Réduis l'amplitude si nécessaire."],
+  ["Fentes arrière","3 séries · 8 par jambe","Fais un pas vers l'arrière et contrôle ton équilibre."],
+  ["Hollow body hold","3 séries · 15 à 25 secondes","Plaque le bas du dos au sol. Plie les genoux si nécessaire."]
+ ]},
+ B:{title:"Contrôle & gainage",desc:"Stabilité, coordination et contrôle corporel",items:[
+  ["Pompes serrées","3 séries · 5 à 8 répétitions","Mains un peu plus rapprochées que les épaules. Sur les genoux si besoin."],
+  ["Glute bridge","3 séries · 12 à 15 répétitions","Pousse dans les talons et contracte les fessiers en haut."],
+  ["Bird dog","3 séries · 10 par côté","Tends bras et jambe opposés sans faire pivoter le bassin."],
+  ["Planche latérale","3 séries · 20 à 30 secondes par côté","Garde le bassin haut et le corps aligné."],
+  ["Bear hold","3 séries · 20 secondes","À quatre pattes, décolle les genoux de quelques centimètres."]
+ ]}
+};
+const defaultState={week:1,session:"A",checks:{},logs:[],notes:{},page:"train",rest:90};
+let state;
+try{state={...defaultState,...JSON.parse(localStorage.getItem("calisthenics-state")||"{}")}}catch(e){state={...defaultState}}
+function save(){localStorage.setItem("calisthenics-state",JSON.stringify(state))}
+function key(){return state.week+"-"+state.session}
+function checked(){return state.checks[key()]||[]}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function toast(msg){let t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",1900)}
+function render(){
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===state.page));
+ const root=document.getElementById("view");
+ if(state.page==="train")root.innerHTML=renderTrain();
+ if(state.page==="progress")root.innerHTML=renderProgress();
+ if(state.page==="history")root.innerHTML=renderHistory();
+ if(state.page==="settings")root.innerHTML=renderSettings();
+}
+function weekPicker(){return `<label class="muted" for="week">SEMAINE</label><select id="week">${Array.from({length:12},(_,i)=>`<option value="${i+1}" ${state.week===i+1?"selected":""}>Semaine ${i+1}</option>`).join("")}</select><div class="weekline">${Array.from({length:12},(_,i)=>`<button data-week="${i+1}" class="${i+1===state.week?"selected":i+1<state.week?"past":""}" aria-label="Semaine ${i+1}"></button>`).join("")}</div>`}
+function renderTrain(){
+ const w=workouts[state.session],done=checked(),pct=Math.round(done.length/5*100);
+ return `<section class="card"><div class="row"><div><div class="eyebrow">Ton programme</div><h2 style="margin:4px 0">Semaine ${state.week} / 12</h2></div><span class="badge">2 séances / semaine</span></div>${weekPicker()}<div class="grid"><div class="stat"><span class="muted">Séance A</span><strong>${state.session==="A"?"Active":"Force"}</strong><span class="muted">Force & poussée</span></div><div class="stat"><span class="muted">Séance B</span><strong>${state.session==="B"?"Active":"Contrôle"}</strong><span class="muted">Contrôle & gainage</span></div></div></section>
+ <div class="tabs"><button data-session="A" class="${state.session==="A"?"active":""}">Séance A</button><button data-session="B" class="${state.session==="B"?"active":""}">Séance B</button></div>
+ <section class="card"><div class="row"><div><div class="eyebrow">Entraînement du jour</div><h2 style="margin:4px 0">${w.title}</h2><div class="sub">${w.desc}</div></div><strong style="font-size:21px">${done.length}/5</strong></div><div class="progress"><span style="width:${pct}%"></span></div><div class="muted">${pct}% terminé · coche chaque exercice une fois effectué</div></section>
+ <h2 class="section">Les exercices</h2>
+ ${w.items.map((it,i)=>`<article class="exercise ${done.includes(i)?"done":""}"><div class="ex-top"><div class="ex-num">${i+1}</div><div class="ex-main"><h3>${it[0]}</h3><div class="ex-meta">${it[1]}</div></div><input class="check" type="checkbox" data-check="${i}" ${done.includes(i)?"checked":""} aria-label="Terminé"></div><div class="ex-tip">${it[2]}</div><div class="details"><label>Répétitions / durée réalisée<input data-result="${i}" placeholder="Ex. 7 reps / 20 s" value="${esc(state.notes[key()+"-"+i]||"")}"></label><label>Ressenti<input data-feel="${i}" placeholder="Ex. facile, moyen…"></label></div></article>`).join("")}
+ <section class="card"><h2>Chronomètre de repos</h2><div class="timer"><div class="muted">TEMPS RESTANT</div><strong id="timer">01:30</strong><div class="row" style="justify-content:center;flex-wrap:wrap"><button class="btn" id="minus">−15 s</button><button class="btn primary" id="timerToggle">Démarrer</button><button class="btn" id="resetTimer">Réinitialiser</button><button class="btn" id="plus">+15 s</button></div></div></section>
+ <section class="card"><h2>Notes de séance</h2><textarea class="note" id="sessionNotes" placeholder="Comment tu t'es sentie ? Difficultés, progrès…">${esc(state.notes[key()+"-general"]||"")}</textarea><div style="height:10px"></div><button class="btn primary full" id="finish" ${done.length!==5?"disabled":""}>✓ Enregistrer cette séance</button><p class="small">Pour valider, coche les cinq exercices. Tu peux ensuite retrouver ta séance dans l'historique.</p></section>`;
+}
+function renderProgress(){
+ const sessions=state.logs.length,done=state.logs.reduce((n,l)=>n+l.completed,0);
+ return `<section class="card"><div class="eyebrow">Vue d'ensemble</div><h2>Ta progression</h2><div class="grid"><div class="stat"><span class="muted">Semaine actuelle</span><strong>${state.week}/12</strong></div><div class="stat"><span class="muted">Séances enregistrées</span><strong>${sessions}</strong></div><div class="stat"><span class="muted">Exercices validés</span><strong>${done}</strong></div><div class="stat"><span class="muted">Objectif hebdo</span><strong>2 séances</strong></div></div></section>
+ <section class="card"><h2>Les 12 semaines</h2><p class="sub">Avance à ton rythme. Passe à l'étape suivante quand tu maîtrises les mouvements avec une bonne technique.</p>${weekPicker()}<div class="history-item"><b>Semaines 1–4 · Fondations</b><p class="small">Apprendre les placements, stabiliser les pompes et construire le gainage.</p></div><div class="history-item"><b>Semaines 5–8 · Développement</b><p class="small">Ajouter progressivement des répétitions et ralentir les phases de descente.</p></div><div class="history-item"><b>Semaines 9–12 · Technique</b><p class="small">Découvrir les progressions du handstand et du L-sit si les bases sont solides.</p></div></section>
+ <section class="card"><h2>Tests de référence</h2><p class="small">Renseigne tes résultats au départ puis toutes les quatre semaines. Ne teste pas jusqu'à l'épuisement.</p>${["Pompes classiques (répétitions)","Planche (secondes)","Hollow hold (secondes)","Pike push-ups (répétitions)"].map((x,i)=>`<label class="muted">${x}<input data-test="${i}" placeholder="Résultat" value="${esc(state.tests?.[i]||"")}"></label><div style="height:8px"></div>`).join("")}<button class="btn full" id="saveTests">Enregistrer mes tests</button></section>`;
+}
+function renderHistory(){
+ return `<section class="card"><div class="eyebrow">Ton carnet</div><h2>Historique des séances</h2><div class="grid"><div class="stat"><span class="muted">Séances terminées</span><strong>${state.logs.length}</strong></div><div class="stat"><span class="muted">Semaines travaillées</span><strong>${new Set(state.logs.map(x=>x.week)).size}</strong></div></div></section><section class="card">${state.logs.length?state.logs.slice().reverse().map((l,i)=>`<div class="history-item"><div class="row"><div><b>Séance ${l.session} · Semaine ${l.week}</b><div class="small">${new Date(l.date).toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"})}</div></div><span class="badge">${l.completed}/5 exercices</span></div>${l.note?`<p class="small">${esc(l.note)}</p>`:""}<button class="btn ghost" data-delete="${state.logs.length-1-i}" style="padding:6px 9px;font-size:11px">Supprimer</button></div>`).join(""):`<p class="sub">Tes séances enregistrées apparaîtront ici. Lance ta première séance !</p>`}</section>`;
+}
+function renderSettings(){
+ return `<section class="card"><div class="eyebrow">Préférences</div><h2>Réglages</h2><label class="muted">Durée de repos par défaut (secondes)<input id="restSetting" type="number" min="15" max="300" step="15" value="${state.rest}"></label><div style="height:14px"></div><button class="btn full" id="saveSettings">Enregistrer</button></section>
+ <section class="card"><h2>Sauvegarder mes données</h2><p class="small">Les données restent sur cet appareil. Exporte régulièrement une sauvegarde pour éviter de les perdre si tu changes de téléphone ou de navigateur.</p><button class="btn primary full" id="export">Exporter ma sauvegarde</button><div style="height:10px"></div><label class="btn full" style="display:block;text-align:center">Importer une sauvegarde<input type="file" id="import" accept="application/json" hidden></label></section>
+ <section class="card"><h2>À propos</h2><p class="small">Application personnelle de suivi de callisthénie, conçue pour un programme de 12 semaines, deux séances hebdomadaires et aucun matériel.</p><p class="small">Conseil : 5 minutes d'échauffement avant chaque séance. Garde une ou deux répétitions en réserve et arrête un mouvement en cas de douleur articulaire.</p><button class="btn ghost full" id="reset">Réinitialiser toutes mes données</button></section>`;
+}
+let timerValue=state.rest,timerInterval=null;
+function updateTimer(){const el=document.getElementById("timer");if(el)el.textContent=String(Math.floor(timerValue/60)).padStart(2,"0")+":"+String(timerValue%60).padStart(2,"0")}
+function stopTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null}const b=document.getElementById("timerToggle");if(b)b.textContent="Démarrer"}
+document.addEventListener("click",e=>{
+ const page=e.target.closest("[data-page]");if(page){state.page=page.dataset.page;save();render();return}
+ const sess=e.target.closest("[data-session]");if(sess){state.session=sess.dataset.session;save();render();return}
+ const wk=e.target.closest("[data-week]");if(wk){state.week=+wk.dataset.week;save();render();return}
+ if(e.target.id==="finish"){const k=key();state.logs.push({week:state.week,session:state.session,completed:5,note:state.notes[k+"-general"]||"",date:new Date().toISOString(),results:state.notes});save();toast("Séance enregistrée !");state.page="history";render();return}
+ if(e.target.id==="timerToggle"){if(timerInterval){stopTimer()}else{e.target.textContent="Pause";timerInterval=setInterval(()=>{timerValue--;updateTimer();if(timerValue<=0){stopTimer();timerValue=0;updateTimer();toast("Temps de repos terminé !");if(navigator.vibrate)navigator.vibrate([150,80,150])}},1000)}return}
+ if(e.target.id==="resetTimer"){stopTimer();timerValue=state.rest;updateTimer();return}
+ if(e.target.id==="plus"||e.target.id==="minus"){timerValue=Math.max(0,timerValue+(e.target.id==="plus"?15:-15));updateTimer();return}
+ if(e.target.id==="saveTests"){state.tests=state.tests||[];document.querySelectorAll("[data-test]").forEach(x=>state.tests[+x.dataset.test]=x.value);save();toast("Tests enregistrés");return}
+ if(e.target.id==="saveSettings"){state.rest=Math.max(15,Math.min(300,+document.getElementById("restSetting").value||90));timerValue=state.rest;save();toast("Réglages enregistrés");return}
+ if(e.target.id==="export"){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="calisthenics-sauvegarde.json";a.click();URL.revokeObjectURL(a.href);return}
+ const del=e.target.closest("[data-delete]");if(del){if(confirm("Supprimer cette séance de l'historique ?")){state.logs.splice(+del.dataset.delete,1);save();render()}return}
+ if(e.target.id==="reset"&&confirm("Effacer définitivement toutes les données enregistrées sur cet appareil ?")){state={...defaultState,checks:{},logs:[],notes:{}};save();render();toast("Données réinitialisées")}
+});
+document.addEventListener("change",e=>{
+ if(e.target.id==="week"){state.week=+e.target.value;save();render();return}
+ if(e.target.dataset.check!==undefined){const i=+e.target.dataset.check,k=key(),arr=checked();state.checks[k]=e.target.checked?[...arr,i]:arr.filter(x=>x!==i);save();render();return}
+ if(e.target.id==="import"){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||!Array.isArray(d.logs))throw 0;state={...defaultState,...d};save();render();toast("Sauvegarde importée")}catch(err){alert("Fichier de sauvegarde invalide.")}};r.readAsText(f)}
+});
+document.addEventListener("input",e=>{
+ if(e.target.dataset.result!==undefined){state.notes[key()+"-"+e.target.dataset.result]=e.target.value;save()}
+ if(e.target.id==="sessionNotes"){state.notes[key()+"-general"]=e.target.value;save()}
+});
+render();
+if("serviceWorker" in navigator && location.protocol.startsWith("http"))navigator.serviceWorker.register("./sw.js").catch(()=>{});
+</script>
+</body></html>
